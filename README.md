@@ -1,6 +1,6 @@
 # La diversification résiste-t-elle aux baisses de marché ?
 
-Projet de Python pour la data science — ENSAE, 2026–2027.
+Projet Python — ENSAE, 2026–2027.
 
 ## Équipe
 
