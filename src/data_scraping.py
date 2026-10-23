@@ -50,3 +50,8 @@ def fetch_and_save_data(
     
     
     return df_prices  # On renvoie le tableau  
+
+
+if __name__ == "__main__":
+    prices = fetch_and_save_data()
+    print(prices.head())
