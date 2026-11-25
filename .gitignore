@@ -1,27 +1,7 @@
-# Fichiers Python générés
-__pycache__/
-*.py[cod]
-.pytest_cache/
-
-# Environnements Python locaux
 .venv/
-venv/
-
-# Fichiers temporaires des notebooks
+__pycache__/
 .ipynb_checkpoints/
-
-# Secrets et configuration locale
-.env
-.env.*
-!.env.example
-
-# Réglages locaux
-.vscode/
+.cache/
+*.pyc
 .DS_Store
-
-# Données locales : conserver seulement les fichiers de présence
-data/raw/*
-!data/raw/.gitkeep
-
-data/processed/*
-!data/processed/.gitkeep
+data/nouvelle_collecte/
