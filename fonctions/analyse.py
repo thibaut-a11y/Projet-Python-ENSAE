@@ -122,7 +122,7 @@ def contexte_inflation(rendements_actifs, inflation):
 def comparer_decennies(prix):
     """compare les écarts à spy pendant les deux décennies"""
     periodes = {
-        "2006–2015": prix.loc[:"2015-12-31"],
+        "2007–2015": prix.loc[:"2015-12-31"],
         "2016–2025": prix.loc["2015-12-31":],
     }
     ecarts = {}
