@@ -5,3 +5,5 @@ requests==2.34.2
 ipykernel==7.4.0
 jupyterlab==4.6.6
 yfinance==1.8.0
+python-dotenv
+pyarrow
