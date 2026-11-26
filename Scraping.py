@@ -5,12 +5,12 @@ import yfinance as yf
 # Définition des actifs étudiés
 TICKERS = {
     "SPY": "Actions",
-    "IEF": "Obligations à long terme",
+    "IEF": "Obligations à moyen terme",
     "SHY" : "Obligations à court terme",
     "GLD": "Or",
     "BIL": "Trésorerie",
     "EFA": "Actions pays développés hors USA et Canada",
-    "EEM": "Action pays émergents"
+    "EEM": "Actions pays émergents"
 }
 
 # Chemin relatif à la racine du projet pour fonctionner partout (script ou notebook)
