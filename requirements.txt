@@ -1,6 +1,7 @@
-pandas
-numpy
-matplotlib
-seaborn
-yfinance
-ipykernel
+numpy==2.5.5
+pandas==3.1.1
+matplotlib==3.11.2
+requests==2.34.2
+ipykernel==7.4.0
+jupyterlab==4.6.6
+yfinance==1.8.0
