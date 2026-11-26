@@ -9,8 +9,8 @@ TICKERS = {
     "SHY" : "Obligations à court terme",
     "GLD": "Or",
     "BIL": "Trésorerie",
-    "EFA": "Actions hors USA et Canada",
-    "
+    "EFA": "Actions pays développés hors USA et Canada",
+    "EEM": "Action pays émergents"
 }
 
 # Chemin relatif à la racine du projet pour fonctionner partout (script ou notebook)
@@ -28,13 +28,10 @@ def fetch_and_save_data(
     end_date: str = "2026-01-01",   #on finit en décembre
     filepath: Path = DATA_RAW_PATH,
 ):
-    """Télécharge les cours ajustés depuis Yahoo Finance et les stocke en local (format Parquet).
-
-    Si le fichier existe déjà, il est chargé directement 
-    """
+    """Télécharge les cours ajustés depuis Yahoo Finance et les stocke en local (format Parquet). Si un fichier existe déjà, il est supprimé"""
     if filepath.exists():
-        print(f"Chargement des données depuis : {filepath}")
-        return pd.read_parquet(filepath)
+        filepath.unlink()
+        print(f"Ancien fichier supprimé : {filepath}")
 
     print(f"Téléchargement des cours pour {tickers} depuis Yahoo Finance...")
     
