@@ -1,0 +1,52 @@
+{
+  "yfinance_version": "1.8.0",
+  "debut_cours": "2005-12-30",
+  "fin_cours_exclue": "2026-01-01",
+  "sources": [
+    {
+      "fichier": "SPY.csv",
+      "source": "Yahoo Finance via yfinance",
+      "collecte_utc": "2026-11-26T08:01:15.493509+00:00"
+    },
+    {
+      "fichier": "EFA.csv",
+      "source": "Yahoo Finance via yfinance",
+      "collecte_utc": "2026-11-26T08:01:15.824816+00:00"
+    },
+    {
+      "fichier": "EEM.csv",
+      "source": "Yahoo Finance via yfinance",
+      "collecte_utc": "2026-11-26T08:01:16.112101+00:00"
+    },
+    {
+      "fichier": "IEF.csv",
+      "source": "Yahoo Finance via yfinance",
+      "collecte_utc": "2026-11-26T08:01:16.465668+00:00"
+    },
+    {
+      "fichier": "GLD.csv",
+      "source": "Yahoo Finance via yfinance",
+      "collecte_utc": "2026-11-26T08:01:16.738076+00:00"
+    },
+    {
+      "fichier": "SHY.csv",
+      "source": "Yahoo Finance via yfinance",
+      "collecte_utc": "2026-11-26T08:01:17.029681+00:00"
+    },
+    {
+      "fichier": "CPI_2004_2013.json",
+      "source": "BLS API v1",
+      "collecte_utc": "2026-11-26T08:01:17.380555+00:00"
+    },
+    {
+      "fichier": "CPI_2014_2023.json",
+      "source": "BLS API v1",
+      "collecte_utc": "2026-11-26T08:01:17.611485+00:00"
+    },
+    {
+      "fichier": "CPI_2024_2025.json",
+      "source": "BLS API v1",
+      "collecte_utc": "2026-11-26T08:01:17.961317+00:00"
+    }
+  ]
+}

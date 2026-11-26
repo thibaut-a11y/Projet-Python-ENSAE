@@ -52,3 +52,43 @@ def telecharger_sources(dossier):
     informations = {"yfinance_version": yf.__version__, "debut_cours": "2005-12-30",
                     "fin_cours_exclue": "2026-01-01", "sources": sources}
     (dossier / "collecte.json").write_text(json.dumps(informations, indent=2))
+
+
+def lire_cours(code_fonds):
+    """lit les cours sauvegardés depuis yfinance sans accès au réseau"""
+    cours = pd.read_csv(BRUT / f"{code_fonds}.csv", index_col="Date", parse_dates=True)
+    cours = cours.loc["2005-12-30":"2025-12-31", ["Adj Close", "Close"]]
+    cours = cours.rename(columns={"Adj Close": "ajuste", "Close": "cloture"})
+    assert cours.index.is_unique and cours.index.is_monotonic_increasing
+    assert not ((cours <= 0) | np.isinf(cours)).any().any()
+    return cours
+
+
+def preparer_prix():
+    """prépare les prix communs et les tableaux de contrôle"""
+    cours_ajustes = {}
+    cours_cloture = {}
+    effectifs = {}
+    for code_fonds in SUPPORTS:
+        cours = lire_cours(code_fonds)
+        cours_ajustes[code_fonds] = cours["ajuste"]
+        cours_cloture[code_fonds] = cours["cloture"]
+        effectifs[code_fonds] = len(cours)
+
+    prix_avant = pd.DataFrame(cours_ajustes)
+    # on garde uniquement les dates disponibles pour tous les fonds
+    prix = prix_avant.dropna()
+    qualite = pd.DataFrame({
+        "exposition": SUPPORTS,
+        "dates reçues": effectifs,
+        "prix manquants": prix_avant.isna().sum(),
+    })
+    assert str(prix.index[0].date()) == "2005-12-30"
+    assert str(prix.index[-1].date()) == "2025-12-31"
+
+    clotures = pd.DataFrame(cours_cloture)
+    comparaison = pd.DataFrame({
+        "rendement ajusté (%)": (prix.iloc[-1] / prix.iloc[0] - 1) * 100,
+        "sans distributions (%)": (clotures.iloc[-1] / clotures.iloc[0] - 1) * 100,
+    })
+    return prix, qualite, comparaison
