@@ -92,3 +92,27 @@ def preparer_prix():
         "sans distributions (%)": (clotures.iloc[-1] / clotures.iloc[0] - 1) * 100,
     })
     return prix, qualite, comparaison
+
+
+
+def lire_inflation():
+    """calcule la variation annuelle des prix sans compléter les mois absents"""
+    valeurs = {}
+    for fichier in sorted(BRUT.glob("CPI_*.json")):
+        serie = json.loads(fichier.read_text())["Results"]["series"][0]
+        assert serie["seriesID"] == "CUSR0000SA0"
+        for ligne in serie["data"]:
+            mois = int(ligne["period"][1:])
+            # on garde les mois et pas les moyennes annuelles
+            if 1 <= mois <= 12:
+                date = f"{ligne['year']}-{mois:02d}"
+                assert date not in valeurs
+                valeurs[date] = ligne["value"]
+
+    indice = pd.Series(valeurs)
+    indice.index = pd.PeriodIndex(indice.index, freq="M")
+    indice = pd.to_numeric(indice, errors="coerce")
+    calendrier = pd.period_range("2004-01", "2025-12", freq="M")
+    indice = indice.reindex(calendrier)
+    inflation = (100 * indice.pct_change(12, fill_method=None)).loc["2006-01":].rename("inflation_pct")
+    return inflation
