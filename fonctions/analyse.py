@@ -10,6 +10,7 @@ ALLOCATIONS = {
     "Monde 60/40": {"SPY": .36, "EFA": .15, "EEM": .09, "IEF": .40},
     "US 50/30/20": {"SPY": .50, "IEF": .30, "GLD": .20},
     "US 60/40 court": {"SPY": .60, "SHY": .40},
+    "US 60/40 cash": {"SPY": .60, "BIL": .40},
 }
 
 
