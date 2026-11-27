@@ -1,37 +1,38 @@
 # Projet portefeuille en crise
 
-Comparaison de six portefeuilles sur 2006–2025. Le [rapport](rapport.ipynb) présente la démarche, les résultats et leurs limites.
+Comparaison de six portefeuilles sur 2006–2025.
 
-## Installation et lancement
+## Lancement
 
-Prérequis : **Python 3.13**. Cloner le dépôt ou télécharger et extraire le ZIP, puis ouvrir un terminal dans le dossier contenant `requirements.txt`.
+Avec Python 3.13, depuis le dossier du projet :
 
-Sous Windows :
-
-```powershell
-py -3.13 --version
-py -3.13 -m pip install -r requirements.txt
+```bash
+python -m pip install -r requirements.txt
 ```
 
-Si `python` désigne déjà Python 3.13, utiliser simplement `python -m pip install -r requirements.txt`.
+Ouvrir `rapport.ipynb` et lancer **Tout exécuter**. Sur macOS avec Python géré par Homebrew, créer un environnement si nécessaire :
 
-Ouvrir ensuite **`rapport.ipynb`** et lancer **Run All / Tout exécuter**.
+```bash
+python3.13 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
 
 ## Données
 
-Les données sont fournies dans `data/raw/` : **six CSV téléchargés avec yfinance** et **trois JSON du BLS**. Conserver ce dossier et `fonctions/` avec le notebook. Après installation des dépendances, le rapport peut être exécuté sans connexion.
+Les trois fichiers Parquet dans `data/raw/` permettent de reproduire le rapport sans téléchargement. Ils sont issus des CSV Yahoo Finance et des JSON BLS fournis dans la version précédente, convertis sans changer les valeurs. `collecte.json` conserve leur provenance. L'indice BLS sauvegardé est nommé `CPIAUCSL` pour correspondre à la série diffusée par FRED.
 
-## Options facultatives
+`scraping.py` regroupe la collecte et la lecture ; `audit.py` vérifie les sources.
 
-Un environnement `.venv` peut être utilisé pour isoler les dépendances. Pour ouvrir JupyterLab dans le navigateur sous Windows : `py -3.13 -m jupyterlab`.
+## Refaire les téléchargements
 
-## Refaire la collecte
-
-Pour télécharger de nouvelles données dans un dossier distinct, exécuter depuis le dossier du projet dans Python :
+Une actualisation remplace les sauvegardes et peut modifier les résultats. Pour FRED, créer un fichier personnel `.env` contenant `FRED_API_KEY=...`, sans le publier. Puis exécuter dans Python :
 
 ```python
-from pathlib import Path
-from fonctions.donnees import telecharger_sources
+from fonctions.scraping import fetch_yahoo, fetch_fred
 
-telecharger_sources(Path("data/nouvelle_collecte"))
+prix = fetch_yahoo(actualiser=True)
+cpi = fetch_fred(actualiser=True)
 ```
+
+Relancer ensuite le rapport et vérifier sa rédaction avec les nouveaux résultats. Le fichier `collecte.json` décrit les sauvegardes fournies : mettre aussi à jour leur provenance après une actualisation.
