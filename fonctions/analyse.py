@@ -92,70 +92,35 @@ def rendements_episodes(capital, episodes):
 
 def pertes_en_baisse(rendements):
     """compare les rendements pendant les séances négatives de spy"""
-    reference = rendements["Actions US"]
-    jours_baisse = reference < 0
-    reference_baisse = reference.loc[jours_baisse]
+    baisse = rendements.loc[rendements["Actions US"] < 0]
     resultats = {}
-    for nom in rendements:
-        serie = rendements.loc[jours_baisse, nom]
+    for nom in baisse:
         resultats[nom] = {
-            "rendement moyen (%)": 100 * serie.mean(),
-            "mieux que SPY (%)": 100 * (serie > reference_baisse).mean(),
-            "sans perte (%)": 100 * (serie >= 0).mean(),
+            "rendement moyen (%)": 100 * baisse[nom].mean(),
+            "mieux que SPY (%)": 100 * (baisse[nom] > baisse["Actions US"]).mean(),
+            "sans perte (%)": 100 * (baisse[nom] >= 0).mean(),
         }
     return pd.DataFrame(resultats).T
 
 
 def contexte_inflation(rendements_actifs, inflation):
-    """compare la corrélation mensuelle dans les deux groupes de taux annuels"""
+    """compare les corrélations mensuelles sous et au dessus de trois pour cent"""
     mensuel = (1 + rendements_actifs).resample("ME").prod() - 1
     mensuel.index = mensuel.index.to_period("M")
     mensuel = mensuel.join(inflation).dropna(subset=["inflation_pct"])
-    mensuel["regime"] = "inflation < 3 %"
-    mensuel.loc[mensuel["inflation_pct"] >= 3, "regime"] = "inflation ≥ 3 %"
-    lignes = []
-    for regime, groupe in mensuel.groupby("regime"):
-        lignes.append({"régime": regime, "nombre de mois": len(groupe),
-                       "corrélation mensuelle SPY–IEF": groupe["SPY"].corr(groupe["IEF"])})
-    return pd.DataFrame(lignes).set_index("régime")
-
-
-def comparer_decennies(prix):
-    """compare les écarts à spy pendant les deux décennies"""
-    periodes = {
-        "2006–2015": prix.loc[:"2015-12-31"],
-        "2016–2025": prix.loc["2015-12-31":],
+    groupes = {
+        "inflation < 3 %": mensuel.loc[mensuel["inflation_pct"] < 3],
+        "inflation ≥ 3 %": mensuel.loc[mensuel["inflation_pct"] >= 3],
     }
-    ecarts = {}
-    for periode, echantillon in periodes.items():
-        rendements = simuler_allocations(echantillon)
-        reference = rendements["Actions US"]
-        jours_baisse = reference < 0
-        ecarts[periode] = {}
-        for nom in rendements:
-            difference = rendements[nom] - reference
-            # on exprime les écarts quotidiens en points de base
-            ecarts[periode][nom] = 10000 * difference.loc[jours_baisse].mean()
-    return pd.DataFrame(ecarts).rename_axis("écart à SPY les jours de baisse (pb)")
-
-
-def comparer_seuils(capital):
-    """compte les cycles mieux traversés que spy pour deux seuils de baisse"""
-    lignes = []
-    for seuil in [.10, .20]:
-        episodes = reperer_episodes(capital["Actions US"], seuil)
-        performances = rendements_episodes(capital, episodes)
-        for nom in capital:
-            mieux_que_spy = performances[nom] > performances["Actions US"]
-            sans_perte = performances[nom] >= 0
-            lignes.append({
-                "seuil (%)": seuil * 100,
-                "portefeuille": nom,
-                "cycles": len(episodes),
-                "cycles mieux que SPY": int(mieux_que_spy.sum()),
-                "cycles sans perte": int(sans_perte.sum()),
-            })
-    return pd.DataFrame(lignes).set_index(["seuil (%)", "portefeuille"])
+    resultats = {}
+    for nom, groupe in groupes.items():
+        resultats[nom] = {
+            "nombre de mois": len(groupe),
+            "corrélation mensuelle SPY–IEF": groupe["SPY"].corr(groupe["IEF"]),
+        }
+    resume = pd.DataFrame(resultats).T.rename_axis("régime")
+    resume["nombre de mois"] = resume["nombre de mois"].astype(int)
+    return resume
 
 
 def comparer_temoin(prix, rendements, episodes):
