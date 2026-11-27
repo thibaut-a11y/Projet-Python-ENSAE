@@ -15,13 +15,12 @@ couleurs = {
     "Monde 60/40": "#8E6C8A",
     "US 50/30/20": "#AD7B16",
     "US 60/40 court": "#727C86",
-  "US 60/40 cash": "#2E8B57",
 }
 
 
 def afficher_figure(figure):
     """affiche la figure en mémoire sans créer de fichier intermédiaire"""
-    figure.text(.01, -.03, "Source : Yahoo Finance, cours ajustés ; calculs du projet, 2007–2025",
+    figure.text(.01, -.03, "Source : Yahoo Finance, cours ajustés ; calculs du projet, 2006–2025",
                 fontsize=8, color="#596773")
     # le tampon conserve la figure en mémoire au lieu de créer un fichier
     tampon = BytesIO()
@@ -38,8 +37,8 @@ def tracer_capital(capital):
     axe.set_yscale("log")
     axe.set_yticks([50, 100, 200, 400, 800], ["50", "100", "200", "400", "800"])
     axe.yaxis.set_minor_formatter(NullFormatter())
-    axe.set(title="Croissance des sept allocations", xlabel="Année",
-            ylabel="Capital en USD, base 100 juin 2007 (échelle logarithmique)")
+    axe.set(title="Croissance des six allocations", xlabel="Année",
+            ylabel="Capital en USD, base 100 fin 2005 (échelle logarithmique)")
     axe.legend(ncol=3, fontsize=8, loc="upper left")
     axe.grid(alpha=.2)
     afficher_figure(figure)
@@ -86,6 +85,6 @@ def tracer_correlations(correlations):
         for numero_colonne, valeur in enumerate(ligne):
             axe.text(numero_colonne, numero_ligne, f"{valeur:.2f}", ha="center", va="center",
                      color="white" if abs(valeur) > .65 else "#263746")
-    axe.set_title("Corrélations des rendements quotidiens, 2007–2025")
+    axe.set_title("Corrélations des rendements quotidiens, 2006–2025")
     figure.colorbar(image, ax=axe, label="Coefficient de Pearson", shrink=.8)
     afficher_figure(figure)
