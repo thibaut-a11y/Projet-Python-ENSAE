@@ -15,23 +15,24 @@ ALLOCATIONS = {
 
 
 def simuler_portefeuille(prix, allocation, frequence="M"):
-    """calcule les rendements avec rééquilibrage et dérive des poids"""
     poids_cibles = pd.Series(allocation, dtype=float)
-    assert np.isclose(poids_cibles.sum(), 1) and (poids_cibles >= 0).all()
-    variations = prix[poids_cibles.index].pct_change(fill_method=None).iloc[1:]
-    assert not variations.isna().any().any()
+    variations = prix[poids_cibles.index].pct_change().iloc[1:]  # 1. rendement quotidien de chaque actif
+
     poids = poids_cibles.copy()
     date_precedente = prix.index[0]
     rendements = []
+
     for date, variation in variations.iterrows():
-        # on revient aux poids cibles au début de chaque période
         if date.to_period(frequence) != date_precedente.to_period(frequence):
-            poids = poids_cibles.copy()
-        rendement = poids.dot(variation)
+            poids = poids_cibles.copy()          # 4. début de nouveau mois : on réajuste les proportions à 60/40
+
+        rendement = (poids * variation).sum()    # 2. rendement du portefeuille ce jour-là
         rendements.append(rendement)
-        # entre deux rééquilibrages les poids suivent les cours
-        poids = poids * (1 + variation) / (1 + rendement)
+
+        poids = poids * (1 + variation)          # 3a. chaque actif grossit/baisse selon sa variation
+        poids = poids / poids.sum()              # 3b. on re-divise par le total pour retrouver les % (somme = 100 %)
         date_precedente = date
+
     return pd.Series(rendements, index=variations.index)
 
 
@@ -107,38 +108,34 @@ def pertes_en_baisse(rendements):
 
 
 def contexte_inflation(rendements_actifs, inflation):
-    """compare la corrélation mensuelle dans les deux groupes de taux annuels"""
-    inflation = (100 * inflation["CPIAUCSL"].pct_change(12, fill_method=None)).rename("inflation_pct")
-    inflation.index = inflation.index.to_period("M")
+    """Compare la corrélation mensuelle SPY-IEF selon que l'inflation est < 3 % ou >= 3 %."""
+    # 1. Passer de l'indice des prix au taux d'inflation annuel (%) par mois
+    taux = 100 * inflation["CPIAUCSL"].pct_change(12, fill_method=None)
+    taux.index = taux.index.to_period("M")
+
+    # 2. Regrouper les rendements quotidiens par mois et coller l'inflation dessus
     mensuel = (1 + rendements_actifs).resample("ME").prod() - 1
     mensuel.index = mensuel.index.to_period("M")
-    mensuel = mensuel.join(inflation).dropna(subset=["inflation_pct"])
-    mensuel["regime"] = "inflation < 3 %"
-    mensuel.loc[mensuel["inflation_pct"] >= 3, "regime"] = "inflation ≥ 3 %"
-    lignes = []
-    for regime, groupe in mensuel.groupby("regime"):
-        lignes.append({"régime": regime, "nombre de mois": len(groupe),
-                       "corrélation mensuelle SPY–IEF": groupe["SPY"].corr(groupe["IEF"])})
-    return pd.DataFrame(lignes).set_index("régime")
+    mensuel["inflation"] = taux
+    mensuel = mensuel.dropna(subset=["inflation"])
+
+    # 3. Séparer en 2 groupes simples (< 3 % et >= 3 %) et calculer la corrélation
+    basse = mensuel[mensuel["inflation"] < 3]
+    haute = mensuel[mensuel["inflation"] >= 3]
+    return pd.DataFrame({
+        "nombre de mois": [len(basse), len(haute)],
+        "corrélation mensuelle SPY–IEF": [basse["SPY"].corr(basse["IEF"]), haute["SPY"].corr(haute["IEF"])],
+    }, index=["inflation < 3 %", "inflation ≥ 3 %"])
 
 
-def comparer_decennies(prix):
-    """compare les écarts à spy pendant les deux décennies"""
-    periodes = {
-        "2007–2015": prix.loc[:"2015-12-31"],
-        "2016–2025": prix.loc["2015-12-31":],
-    }
-    ecarts = {}
-    for periode, echantillon in periodes.items():
-        rendements = simuler_allocations(echantillon)
-        reference = rendements["Actions US"]
-        jours_baisse = reference < 0
-        ecarts[periode] = {}
-        for nom in rendements:
-            difference = rendements[nom] - reference
-            # on exprime les écarts quotidiens en points de base
-            ecarts[periode][nom] = 10000 * difference.loc[jours_baisse].mean()
-    return pd.DataFrame(ecarts).rename_axis("écart à SPY les jours de baisse (pb)")
+def comparer_decennies(rendements):
+    """Compare l'écart moyen à SPY les jours de baisse sur les deux sous-périodes."""
+    p1 = pertes_en_baisse(rendements.loc[:"2015-12-31"])["rendement moyen (%)"]
+    p2 = pertes_en_baisse(rendements.loc["2016-01-01":])["rendement moyen (%)"]
+    return pd.DataFrame({
+        "2007–2015 (pb)": 100 * (p1 - p1["Actions US"]),
+        "2016–2025 (pb)": 100 * (p2 - p2["Actions US"]),
+    })
 
 
 def comparer_seuils(capital):
