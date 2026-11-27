@@ -15,6 +15,7 @@ couleurs = {
     "Monde 60/40": "#8E6C8A",
     "US 50/30/20": "#AD7B16",
     "US 60/40 court": "#727C86",
+  "US 60/40 cash": "#2E8B57",
 }
 
 
