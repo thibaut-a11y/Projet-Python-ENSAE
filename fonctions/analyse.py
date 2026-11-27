@@ -37,7 +37,7 @@ def simuler_portefeuille(prix, allocation, frequence="M"):
 
 
 def simuler_allocations(prix, frequence="M"):
-    """applique la simulation aux six allocations"""
+    """applique la simulation aux sept allocations"""
     rendements = {}
     for nom, poids in ALLOCATIONS.items():
         rendements[nom] = simuler_portefeuille(prix, poids, frequence)
