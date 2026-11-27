@@ -38,7 +38,7 @@ def tracer_capital(capital):
     axe.set_yscale("log")
     axe.set_yticks([50, 100, 200, 400, 800], ["50", "100", "200", "400", "800"])
     axe.yaxis.set_minor_formatter(NullFormatter())
-    axe.set(title="Croissance des six allocations", xlabel="Année",
+    axe.set(title="Croissance des sept allocations", xlabel="Année",
             ylabel="Capital en USD, base 100 juin 2007 (échelle logarithmique)")
     axe.legend(ncol=3, fontsize=8, loc="upper left")
     axe.grid(alpha=.2)
