@@ -108,6 +108,8 @@ def pertes_en_baisse(rendements):
 
 def contexte_inflation(rendements_actifs, inflation):
     """compare la corrélation mensuelle dans les deux groupes de taux annuels"""
+    inflation = (100 * cpi["CPIAUCSL"].pct_change(12, fill_method=None)).rename("inflation_pct")
+    inflation.index = inflation.index.to_period("M")
     mensuel = (1 + rendements_actifs).resample("ME").prod() - 1
     mensuel.index = mensuel.index.to_period("M")
     mensuel = mensuel.join(inflation).dropna(subset=["inflation_pct"])
