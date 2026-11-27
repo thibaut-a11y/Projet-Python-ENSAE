@@ -1,3 +1,5 @@
+**Auteurs :** Thibaut Rosset et Alexandre D'Hérissart
+
 # Projet portefeuille en crise
 
 Comparaison de six portefeuilles sur 2006–2025.
