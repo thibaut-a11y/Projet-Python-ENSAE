@@ -5,17 +5,18 @@ couleurs = {
     "Actions US": "#173F5F", "Actions monde": "#D55E00",
     "US 60/40": "#007E87", "Monde 60/40": "#8E6C8A",
     "US 50/30/20": "#AD7B16", "US 60/40 court": "#727C86",
+    "US 60/40 cash": "#2E8B57",
 }
 plt.rcParams.update({"font.size": 10, "axes.spines.top": False,
                      "axes.spines.right": False})
 
 
 def tracer_capital(capital):
-    """compare la croissance des six portefeuilles en base cent"""
+    """compare la croissance des sept portefeuilles en base cent"""
     axe = (100 * capital).plot(figsize=(10, 5), logy=True,
                               color=[couleurs[nom] for nom in capital])
-    axe.set(title="Croissance des six allocations", xlabel="Année",
-            ylabel="Capital en USD base 100 fin 2005 — échelle logarithmique")
+    axe.set(title="Croissance des sept allocations", xlabel="Année",
+            ylabel="Capital en USD base 100 — échelle logarithmique")
     axe.set_yticks([50, 100, 200, 400, 800], ["50", "100", "200", "400", "800"])
     axe.minorticks_off()
     axe.legend(ncol=3, fontsize=8)
@@ -64,7 +65,7 @@ def tracer_correlations(correlations):
         for j, valeur in enumerate(ligne):
             axe.text(j, i, f"{valeur:.2f}", ha="center", va="center",
                      color="white" if abs(valeur) > .65 else "black")
-    axe.set_title("Corrélations quotidiennes des actifs — 2006–2025")
+    axe.set_title("Corrélations quotidiennes des actifs — 2007–2025")
     figure.colorbar(image, ax=axe, label="Coefficient de Pearson")
     plt.tight_layout()
     plt.show()
